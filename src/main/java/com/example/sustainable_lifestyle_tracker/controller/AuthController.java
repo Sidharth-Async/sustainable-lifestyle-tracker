@@ -66,7 +66,12 @@ public class AuthController {
 
             final String token = jwtUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(new AuthResponse(token, userDetails.getUsername()));
+            // Get the user entity to access displayUsername
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            AuthResponse authResponse = new AuthResponse(token, user.getDisplayUsername());
+            return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid credentials");

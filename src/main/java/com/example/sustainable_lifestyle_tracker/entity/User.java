@@ -21,6 +21,9 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(name = "display_username") // Add this column mapping
+    private String displayUsername;
+
     @Column(nullable = false)
     private String email;
 
@@ -43,6 +46,7 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.displayUsername = username; // Set displayUsername to username by default
         // ✅ default role on constructor
         this.roles.add("USER");
     }
@@ -61,7 +65,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return email; // This returns email for Spring Security
     }
 
     @Override
@@ -92,15 +96,21 @@ public class User implements UserDetails {
         this.id = id;
     }
 
+    public String getActualUsername() { // Renamed to avoid confusion
+        return username;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
+    // Fixed displayUsername methods
     public String getDisplayUsername(){
-        return username;
+        return displayUsername != null ? displayUsername : username;
     }
-    public void setDisplayUsername(String username){
-        this.username = username;
+
+    public void setDisplayUsername(String displayUsername){
+        this.displayUsername = displayUsername;
     }
 
     public String getEmail() {

@@ -3,11 +3,11 @@ package com.example.sustainable_lifestyle_tracker.dto;
 public class AuthResponse {
     private String token;
     private String type = "Bearer";
-    private String username;
+    private String displayUsername;
 
-    public AuthResponse(String token, String username) {
+    public AuthResponse(String token, String displayUsername) {
         this.token = token;
-        this.username = username;
+        this.displayUsername = displayUsername;
     }
 
     public String getToken() {
@@ -17,8 +17,15 @@ public class AuthResponse {
     public String getType() {
         return type;
     }
+    public String getDisplayUsername() {
+        return displayUsername;
+    }
 
-    public String getUsername() {
-        return username;
+    public void setDisplayUsername(String displayUsername) {
+        this.displayUsername = displayUsername;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
