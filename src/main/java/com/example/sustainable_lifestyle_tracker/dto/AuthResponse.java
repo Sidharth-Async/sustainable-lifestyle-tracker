@@ -4,10 +4,12 @@ public class AuthResponse {
     private String token;
     private String type = "Bearer";
     private String displayUsername;
+    private Long userId;
 
-    public AuthResponse(String token, String displayUsername) {
+    public AuthResponse(String token, String displayUsername, Long userId) {
         this.token = token;
         this.displayUsername = displayUsername;
+        this.userId = userId;
     }
 
     public String getToken() {
@@ -27,5 +29,13 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

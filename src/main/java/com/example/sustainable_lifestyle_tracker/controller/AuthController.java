@@ -70,7 +70,7 @@ public class AuthController {
             User user = userRepository.findByEmail(loginRequest.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            AuthResponse authResponse = new AuthResponse(token, user.getDisplayUsername());
+            AuthResponse authResponse = new AuthResponse(token, user.getDisplayUsername(), user.getId());
             return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
