@@ -8,5 +8,7 @@ import java.util.Optional;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByUserId(Long userId);
+    List<Activity> findByUserIdOrderByDateDesc(Long userId);
+    List<Activity> findTop10ByUserIdOrderByDateDesc(Long userId);
     List<Activity> findByUserIdAndDateBetween(Long userId, String startDate, String endDate);
 }

@@ -2,183 +2,66 @@ package com.example.sustainable_lifestyle_tracker.controller;
 
 import com.example.sustainable_lifestyle_tracker.dto.ActivityDTO;
 import com.example.sustainable_lifestyle_tracker.entity.Activity;
-import com.example.sustainable_lifestyle_tracker.service.EmissionService;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
+import com.example.sustainable_lifestyle_tracker.entity.User;
+import com.example.sustainable_lifestyle_tracker.repository.UserRepository;
+import com.example.sustainable_lifestyle_tracker.service.ActivityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/activities")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class ActivityController {
 
-    private final EmissionService emissionService;
+    @Autowired
+    private ActivityService activityService;
 
-    public ActivityController(EmissionService emissionService) {
-        this.emissionService = emissionService;
+    @Autowired
+    private UserRepository userRepository;
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getId();
     }
 
-    /**
-     * Create a new activity with CO2e calculation
-     */
     @PostMapping
     public ResponseEntity<?> createActivity(@RequestBody ActivityDTO activityDTO) {
         try {
-            Activity savedActivity = emissionService.saveActivity(activityDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedActivity);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error creating activity: " + e.getMessage());
+            // Attach current user ID
+            Long userId = getCurrentUserId();
+            activityDTO.setUserId(userId);
+
+            System.out.println("=== Creating Activity ===");
+            System.out.println("User ID: " + userId);
+            System.out.println("Type: " + activityDTO.getType());
+            System.out.println("Distance: " + activityDTO.getDistance());
+            System.out.println("Vehicle Type: " + activityDTO.getVehicleType());
+
+            Activity savedActivity = activityService.createActivity(activityDTO);
+
+            return ResponseEntity.ok(savedActivity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error creating activity: " + e.getMessage());
         }
     }
 
-    /**
-     * Get all activities for the current user
-     */
     @GetMapping
-    public ResponseEntity<List<Activity>> getUserActivities() {
+    public ResponseEntity<?> getActivities() {
         try {
-            List<Activity> activities = emissionService.getUserActivities();
+            Long userId = getCurrentUserId();
+            List<Activity> activities = activityService.getAllActivities(userId);
             return ResponseEntity.ok(activities);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Get activities for the current user within a date range
-     */
-    @GetMapping("/date-range")
-    public ResponseEntity<List<Activity>> getActivitiesByDateRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        try {
-            List<Activity> activities = emissionService.getActivitiesByDateRange(startDate, endDate);
-            return ResponseEntity.ok(activities);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Calculate total emissions for the current user within a date range
-     */
-    @GetMapping("/total-emissions")
-    public ResponseEntity<Double> calculateTotalEmissions(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        try {
-            Double totalEmissions = emissionService.calculateTotalEmissions(startDate, endDate);
-            return ResponseEntity.ok(totalEmissions);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Get activities for the current user by specific date
-     */
-    @GetMapping("/date/{date}")
-    public ResponseEntity<List<Activity>> getActivitiesByDate(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        try {
-            List<Activity> activities = emissionService.getActivitiesByDateRange(date, date);
-            return ResponseEntity.ok(activities);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Get today's activities for the current user
-     */
-    @GetMapping("/today")
-    public ResponseEntity<List<Activity>> getTodayActivities() {
-        try {
-            LocalDate today = LocalDate.now();
-            List<Activity> activities = emissionService.getActivitiesByDateRange(today, today);
-            return ResponseEntity.ok(activities);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Get this week's activities for the current user
-     */
-    @GetMapping("/this-week")
-    public ResponseEntity<List<Activity>> getThisWeekActivities() {
-        try {
-            LocalDate today = LocalDate.now();
-            LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-            List<Activity> activities = emissionService.getActivitiesByDateRange(startOfWeek, today);
-            return ResponseEntity.ok(activities);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Get this month's activities for the current user
-     */
-    @GetMapping("/this-month")
-    public ResponseEntity<List<Activity>> getThisMonthActivities() {
-        try {
-            LocalDate today = LocalDate.now();
-            LocalDate startOfMonth = today.withDayOfMonth(1);
-            List<Activity> activities = emissionService.getActivitiesByDateRange(startOfMonth, today);
-            return ResponseEntity.ok(activities);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Calculate today's total emissions
-     */
-    @GetMapping("/today/total-emissions")
-    public ResponseEntity<Double> getTodayTotalEmissions() {
-        try {
-            LocalDate today = LocalDate.now();
-            Double totalEmissions = emissionService.calculateTotalEmissions(today, today);
-            return ResponseEntity.ok(totalEmissions);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Calculate this week's total emissions
-     */
-    @GetMapping("/this-week/total-emissions")
-    public ResponseEntity<Double> getThisWeekTotalEmissions() {
-        try {
-            LocalDate today = LocalDate.now();
-            LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-            Double totalEmissions = emissionService.calculateTotalEmissions(startOfWeek, today);
-            return ResponseEntity.ok(totalEmissions);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Calculate this month's total emissions
-     */
-    @GetMapping("/this-month/total-emissions")
-    public ResponseEntity<Double> getThisMonthTotalEmissions() {
-        try {
-            LocalDate today = LocalDate.now();
-            LocalDate startOfMonth = today.withDayOfMonth(1);
-            Double totalEmissions = emissionService.calculateTotalEmissions(startOfMonth, today);
-            return ResponseEntity.ok(totalEmissions);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.badRequest().body("Error fetching activities: " + e.getMessage());
         }
     }
 }

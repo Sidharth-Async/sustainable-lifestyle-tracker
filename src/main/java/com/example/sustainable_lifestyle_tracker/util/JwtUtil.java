@@ -1,5 +1,6 @@
 package com.example.sustainable_lifestyle_tracker.util;
 
+import com.example.sustainable_lifestyle_tracker.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
