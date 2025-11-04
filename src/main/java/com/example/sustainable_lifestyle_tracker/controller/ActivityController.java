@@ -6,12 +6,14 @@ import com.example.sustainable_lifestyle_tracker.entity.User;
 import com.example.sustainable_lifestyle_tracker.repository.UserRepository;
 import com.example.sustainable_lifestyle_tracker.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/activities")
@@ -64,4 +66,27 @@ public class ActivityController {
             return ResponseEntity.badRequest().body("Error fetching activities: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteActivity(@PathVariable Long id, Authentication authentication) {
+        try {
+            // Get the currently logged-in user's username
+            String username = authentication.getName();
+
+            boolean deleted = activityService.deleteActivity(id, username);
+
+            if (deleted) {
+                return ResponseEntity.ok(Map.of("message", "Activity deleted successfully"));
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "You don't have permission to delete this activity or it doesn't exist"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while deleting the activity"));
+        }
+    }
+
 }

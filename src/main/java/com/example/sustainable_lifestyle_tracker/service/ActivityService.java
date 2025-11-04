@@ -2,7 +2,9 @@ package com.example.sustainable_lifestyle_tracker.service;
 
 import com.example.sustainable_lifestyle_tracker.dto.ActivityDTO;
 import com.example.sustainable_lifestyle_tracker.entity.Activity;
+import com.example.sustainable_lifestyle_tracker.entity.User;
 import com.example.sustainable_lifestyle_tracker.repository.ActivityRepository;
+import com.example.sustainable_lifestyle_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,8 @@ public class ActivityService {
 
     @Autowired
     private ActivityRepository activityRepository;
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private CO2CalculatorService co2CalculatorService;
 
@@ -58,11 +61,39 @@ public class ActivityService {
     }
 
     public boolean deleteActivity(Long id, String username) {
-        Optional<Activity> activity = activityRepository.findById(id);
-        if (activity.isPresent() && activity.get().getId().equals(username)) {
-            activityRepository.delete(activity.get());
-            return true;
+        System.out.println("=== Delete Request ===");
+        System.out.println("Activity ID: " + id);
+        System.out.println("Username: " + username);
+
+        // ✅ 1. Get the user's ID from username
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isEmpty()) {
+            System.out.println("User not found for username: " + username);
+            return false;
         }
-        return false;
+
+        Long userId = user.get().getId();
+
+        // ✅ 2. Find the activity
+        Optional<Activity> activity = activityRepository.findById(id);
+        if (activity.isEmpty()) {
+            System.out.println("Activity not found");
+            return false;
+        }
+
+        // ✅ 3. Check ownership
+        Activity act = activity.get();
+        System.out.println("Activity User ID: " + act.getUserId());
+        System.out.println("Logged-in User ID: " + userId);
+
+        if (!act.getUserId().equals(userId)) {
+            System.out.println("User ID mismatch — cannot delete!");
+            return false;
+        }
+
+        // ✅ 4. Delete the activity
+        activityRepository.delete(act);
+        System.out.println("Activity deleted successfully!");
+        return true;
     }
 }
