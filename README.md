@@ -14,7 +14,22 @@ The Sustainable Lifestyle Tracker offers simple, core functionalities to manage 
 
 📸 Screenshots
 
-To give users a quick look at the application, please replace the placeholders below with actual screenshots of your running project.
+![Home page](https://github.com/Sidharth-Async/sustainable-lifestyle-tracker/blob/065d3e50d0031ffda87f347e06cd7111b5d2d0f9/Assets/Screenshot%20(4).png)  
+
+**Login & Signup**  
+![Login Page 1](https://github.com/Sidharth-Async/sustainable-lifestyle-tracker/blob/065d3e50d0031ffda87f347e06cd7111b5d2d0f9/Assets/Screenshot%20(5).png)
+
+**Dashboard**
+![Dashboard](https://github.com/Sidharth-Async/sustainable-lifestyle-tracker/blob/065d3e50d0031ffda87f347e06cd7111b5d2d0f9/Assets/Screenshot%20(7).png)
+
+**Analytics and Reports**
+![Analytics and Reports](https://github.com/Sidharth-Async/sustainable-lifestyle-tracker/blob/065d3e50d0031ffda87f347e06cd7111b5d2d0f9/Assets/Screenshot%20(8).png)
+
+**Log New Activity**
+![Activity](https://github.com/Sidharth-Async/sustainable-lifestyle-tracker/blob/065d3e50d0031ffda87f347e06cd7111b5d2d0f9/Assets/Screenshot%20(9).png)
+
+
+   
 
 💻 Technology Stack
 
