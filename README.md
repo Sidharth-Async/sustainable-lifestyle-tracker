@@ -37,11 +37,11 @@ This project is built using both a Java backend and a separate frontend interfac
 
     Backend: Java with the Spring Boot framework.
 
-    Frontend: (Please specify your frontend stack, e.g., React, Vue.js, or plain HTML/CSS/JS).
+    Frontend: React.
 
     Build Tool: Apache Maven.
 
-    Database: (Please specify, e.g., MySQL or H2).
+    Database: MySQL.
 
 🚀 Getting Started
 
@@ -56,8 +56,6 @@ You will need the following installed:
     Apache Maven
 
     Git
-
-    (If you use a specific frontend framework, list its prerequisites here, e.g., Node.js/npm)
 
 Installation and Setup
 
@@ -83,20 +81,11 @@ Bash
 
     java -jar target/sustainable-lifestyle-tracker-0.0.1-SNAPSHOT.jar
 
-Frontend Setup (If separate):
+Frontend Setup :
 
-    If your frontend code is in a separate directory (e.g., frontend/), navigate to it.
-
-    Install dependencies (adjust commands based on your framework):
-    Bash
-
-# Example for a Node.js-based frontend
-npm install
-
-Start the frontend development server:
-Bash
-
-        # Example command
-        npm start
+    git clone https://github.com/Sidharth-Async/SLT-Frontend.git
+    cd SLT-Frontend 
+    npm install
+    npm start
 
 The backend usually starts on http://localhost:8080. Check your console output for the exact frontend URL (often http://localhost:3000).
